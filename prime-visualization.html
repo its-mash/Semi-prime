@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<title>Prime</title>
+	<style>
+		table, th, td {
+		    border-collapse: collapse;
+		    background-color: #eaefed;
+		    border:3px solid grey;
+
+		}
+		th,td{
+			width:40px;
+			height: 30px;
+			text-align: center;
+			border-right: none;
+		    border-bottom:none;
+		}
+	</style>
+</head>
+<body>
+	<div class="gridDiv">
+	</div>
+	<script>
+
+		$(document).ready(function () {
+			var row=15,colum=25,n=row*colum,speed=500;
+
+			function sleep(miliseconds) {
+			   var currentTime = new Date().getTime();
+
+			   while (currentTime + miliseconds >= new Date().getTime()) {
+			   }
+			   return true;
+			}
+
+			function getI(row,col){
+				console.log(row,col);
+				var tableRow=document.getElementsByTagName("tr");
+				return tableRow[row].getElementsByTagName("td")[col];
+			}
+			function mark(p,isPrime){
+				var row=Math.ceil(p/colum)-1,col=p-row*colum-1;
+				
+				console.log("Row : "+row+" , Col:"+col);
+				if(isPrime){
+					getI(row,col).style.backgroundColor="#12e594";
+					//getI(Math.ceil(p/colum)-1,p%colum -1).style.borderRadius="15px";
+				}
+				else
+					getI(row,col).style.backgroundColor="#ffb366";
+				//wait(speed);
+			}
+			function selectD(p){
+				var row=Math.ceil(p/colum)-1,col=p-row*colum-1;
+				var current=getI(row,col);
+				current.style.borderRadius="15px";
+				console.log("Select D: "+p);
+
+			}
+			function selectB(p){
+				var row=Math.ceil(p/colum)-1,col=p-row*colum-1;
+
+				var current=getI(row,col);
+				current.style.border = "3px solid #e80b21";
+				current.style.borderRadius="15px";
+				console.log("Select B: "+p);
+
+			}
+			function selectC(p){
+				var row=Math.ceil(p/colum)-1,col=p-row*colum-1;
+
+				var current=getI(row,col);
+				current.style.border = "3px solid blue";
+				//current.style.borderRadius="15px";
+				console.log("Select C: "+p);
+
+			}
+			function unSelect(p){
+				var row=Math.ceil(p/colum)-1,col=p-row*colum-1;
+
+				console.log("unSelect : "+p);
+
+				var current=getI(row,col);
+
+				current.style.border = "";
+				
+			}
+
+		
+			function myPrime(){
+				var prime=new Array(n+1);
+				var sq=true;
+				for(var i=0;i<prime.length;i++)
+					prime[i]=false;
+
+				prime[2]=true;
+				prime[3]=true;
+
+				mark(2,true);
+				selectD(2);
+
+				mark(3,true);
+				selectD(3);
+
+				var r=4;
+
+				var i=5,iPrevious=i;
+				function predict(){
+					setTimeout(function(){
+						if(i<=n){
+							unSelect(iPrevious)
+							selectB(i);
+							
+							prime[i]=!prime[i];
+							mark(i,prime[i]);
+							r=6-r;
+							if(sq && prime[i]){
+								var isquare=i*i,falsePrimeDis,circle=6*i,falsePrimeDis=(6-r)*i;
+
+								if(isquare>=n)
+									sq=false;
+
+								var nxtFlsPrime=isquare,fPrevious=nxtFlsPrime;
+
+								var x=setInterval(function(){
+									
+									if(nxtFlsPrime<=n){
+										console.log("xx"+nxtFlsPrime);
+										unSelect(fPrevious);
+										prime[nxtFlsPrime]=true;
+										selectC(nxtFlsPrime);
+
+										mark(nxtFlsPrime,prime[nxtFlsPrime]);
+
+										falsePrimeDis= circle - falsePrimeDis;
+
+										//unSelect(nxtFlsPrime);
+										//console.log("in: "+nxtFlsPrime);
+										fPrevious=nxtFlsPrime;
+										nxtFlsPrime+=falsePrimeDis;
+									}
+									else{
+										console.log("ll+"+fPrevious);
+										if(sq){
+											unSelect(fPrevious);
+										}
+										predict();
+										clearInterval(x);
+									}
+									
+								},speed);
+							}
+							else{
+								unSelect(iPrevious);
+								predict();
+							}
+							iPrevious=i;
+							i+=r;
+							if(i>=n)
+								unSelect(iPrevious);
+
+						}
+					},speed);
+					
+				}
+				predict();
+				// for(var i=5;i<=n;i+=r){
+				// 		selectB(i);
+
+				// 		prime[i]=!prime[i];
+				// 		mark(i,prime[i]);
+				// 		r=6-r;
+				// 		if(sq && prime[i]){
+				// 			var isquare=i*i,falsePrimeDis,circle=6*i,falsePrimeDis=(6-r)*i;
+
+				// 			if(isquare>=n)
+				// 				sq=false;
+				// 			for(var nxtFlsPrime=isquare;nxtFlsPrime<=n;nxtFlsPrime+=falsePrimeDis){
+								
+				// 					console.log("xx"+nxtFlsPrime);
+									
+				// 					prime[nxtFlsPrime]=true;
+				// 					selectC(nxtFlsPrime);
+
+				// 					mark(nxtFlsPrime,prime[nxtFlsPrime]);
+				// 					falsePrimeDis= circle - falsePrimeDis;
+
+				// 					unSelect(nxtFlsPrime);
+								
+				// 			}
+				// 	    }
+						
+				// }
+				//return true;
+			}
+
+			var table = $('<table></table>').addClass('tableClass');
+			
+		    
+			for(var i=0;i<row;i++){
+				var tableRow=$('<tr></tr>').addClass('rowClass');
+			  
+				for(var j=0;j<colum;j++){
+					
+				 	var tableColum=$('<td></td>').addClass('colClass').text(i*colum+j+1);
+				 	tableRow.append(tableColum);
+
+			    }
+			 	table.append(tableRow);
+
+			}
+			$('.gridDiv').append(table);
+
+			myPrime(n,row,colum);
+
+
+		}); 
+	</script>
+</body>
+</html>
